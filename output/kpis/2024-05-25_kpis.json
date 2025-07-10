@@ -1,0 +1,9 @@
+{
+  "trip_date": "2024-05-25",
+  "total_trips": 9,
+  "total_fare": 504.61,
+  "average_fare": 56.07,
+  "min_fare": 10.1,
+  "max_fare": 96.94,
+  "stale_trip_count": 0
+}
