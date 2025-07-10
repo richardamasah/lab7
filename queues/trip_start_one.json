@@ -1,0 +1,1 @@
+{"event_type": "trip_start", "trip_id": "c66ce556bc", "data": {"trip_id": "c66ce556bc", "pickup_location_id": "93", "dropoff_location_id": "93", "vendor_id": "1", "pickup_datetime": "2024-05-25 13:19:00", "estimated_dropoff_datetime": "2024-05-25 14:03:00", "estimated_fare_amount": "34.18"}}
