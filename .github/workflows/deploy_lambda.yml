@@ -1,11 +1,11 @@
-name: Deploy Both Lambdas to AWS
+name: Deploy Both Lambdas to AWS1
 
 on:
   push:
     branches:
       - lab7
-    paths:
-      - "lambda/**"
+    
+      
 
 jobs:
   deploy:
