@@ -1,11 +1,9 @@
-name: Deploy Both Lambdas to AWS1
+name: Deploy Both Lambdas to AWS
 
 on:
   push:
     branches:
       - lab7
-    
-      
 
 jobs:
   deploy:
@@ -17,32 +15,27 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
       - name: 📦 Zip processor Lambda
-        run: |
-          zip -j processor.zip lambda/processor_handler.py
+        run: zip -j processor.zip lambda/processor_handler.py
 
       - name: 🚀 Deploy processor Lambda
-        uses: aws-actions/aws-cli-action@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.REGION }}
-          inlineScript: |
-            aws lambda update-function-code \
-              --function-name handle_trip_events_lambda \
-              --zip-file fileb://processor.zip
+        run: |
+          aws lambda update-function-code \
+            --function-name handle_trip_events_lambda \
+            --zip-file fileb://processor.zip
 
       - name: 📦 Zip KPI Lambda
-        run: |
-          zip -j kpi.zip lambda/kpi_handler.py
+        run: zip -j kpi.zip lambda/kpi_handler.py
 
       - name: 🚀 Deploy KPI Lambda
-        uses: aws-actions/aws-cli@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.REGION }}
-          inlineScript: |
-            aws lambda update-function-code \
-              --function-name generate_kpis_lambda \
-              --zip-file fileb://kpi.zip
+        run: |
+          aws lambda update-function-code \
+            --function-name generate_kpis_lambda \
+            --zip-file fileb://kpi.zip
