@@ -1,50 +1,36 @@
-import csv
-import json
 import boto3
+import json
 from pathlib import Path
+from time import sleep
 
-STREAM_NAME = "trip_events_stream"
-REGION = "eu-north-1"
-MAX_EVENTS = 10  # Number of matched trips to simulate
+BASE_DIR = Path(__file__).resolve().parent.parent
+KINESIS_STREAM_NAME = 'trip_events_stream'
+kinesis = boto3.client('kinesis')
 
-kinesis = boto3.client("kinesis", region_name=REGION)
+def send_events(path, limit=1000, label=''):
+    with open(path) as f:
+        lines = f.readlines()
 
-def load_csv(path):
-    with open(path, 'r') as f:
-        return list(csv.DictReader(f))
+    for i, line in enumerate(lines[:limit]):
+        data = json.loads(line.strip())
+        payload = json.dumps(data)
+        kinesis.put_record(
+            StreamName=KINESIS_STREAM_NAME,
+            Data=payload,
+            PartitionKey=data['trip_id']
+        )
 
-def send_event(event):
-    response = kinesis.put_record(
-        StreamName=STREAM_NAME,
-        Data=json.dumps(event),
-        PartitionKey=event["trip_id"]
-    )
-    print(f"✅ Sent: {event['event_type']} - {event['trip_id']}")
+        if i % 100 == 0:
+            print(f"✅ {label} Sent {i + 1} events")
 
-def build_event(row, event_type):
-    trip_id = row["trip_id"].strip()
-    row["trip_id"] = trip_id  # Ensure consistency
-    return {
-        "event_type": event_type,
-        "trip_id": trip_id,
-        "data": row
-    }
+    print(f"🏁 Finished sending {label} events")
 
 if __name__ == "__main__":
-    base = Path(__file__).resolve().parent
-    data_dir = base / "data"
+    start_path = BASE_DIR / 'queues' / 'trip_start_queue.json'
+    end_path = BASE_DIR / 'queues' / 'trip_end_queue.json'
 
-    trip_start = load_csv(data_dir / "trip_start.csv")
-    trip_end = load_csv(data_dir / "trip_end.csv")
+    print("📤 Sending 1,000 trip_start events to Kinesis...")
+    send_events(start_path, limit=1000, label='trip_start')
 
-    start_ids = {row["trip_id"].strip() for row in trip_start}
-    end_ids = {row["trip_id"].strip() for row in trip_end}
-    matched_ids = list(start_ids & end_ids)[:MAX_EVENTS]
-
-    start_events = [build_event(row, "trip_start") for row in trip_start if row["trip_id"].strip() in matched_ids]
-    end_events = [build_event(row, "trip_end") for row in trip_end if row["trip_id"].strip() in matched_ids]
-
-    print(f"📤 Sending {len(start_events)} trip_start and {len(end_events)} trip_end events to Kinesis...")
-
-    for event in start_events + end_events:
-        send_event(event)
+    print("📤 Sending 1,000 trip_end events to Kinesis...")
+    send_events(end_path, limit=1000, label='trip_end')
