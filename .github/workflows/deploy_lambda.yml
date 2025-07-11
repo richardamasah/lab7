@@ -1,4 +1,4 @@
-name: Deploy Lambda to AWS cloud
+name: Deploy Both Lambdas
 
 on:
   push:
@@ -10,23 +10,43 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-      - name: 📥 Checkout repo
+      - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: 📦 Zip Lambda function
+      - name: 📦 Zip processor Lambda
         run: |
           cd lambda
-          zip -r ../lambda.zip .
+          zip -r ../processor.zip processor_handler.py
+          cd ..
 
-      - name: 🚀 Deploy to Lambda
+      - name: 🚀 Deploy processor Lambda
         uses: aws-actions/aws-cli-action@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.REGION }}
           inlineScript: |
             aws lambda update-function-code \
-              --function-name ${{ secrets.LAMBDA_NAME }} \
-              --zip-file fileb://lambda.zip
+              --function-name handle_trip_events_lambda \
+              --zip-file fileb://processor.zip
+
+      - name: 📦 Zip KPI Lambda
+        run: |
+          cd lambda
+          zip -r ../kpi.zip kpi_handler.py
+          cd ..
+
+      - name: 🚀 Deploy KPI Lambda
+        uses: aws-actions/aws-cli-action@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+          inlineScript: |
+            aws lambda update-function-code \
+              --function-name generate_kpis_lambda \
+              --zip-file fileb://kpi.zip
