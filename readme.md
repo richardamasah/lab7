@@ -12,6 +12,8 @@ The system ingests `trip_start` and `trip_end` events using AWS Kinesis, validat
 
 ###  Project Scope
 
+![Architectural Diagram](images/architecture.png)
+
 This project covers the following end-to-end objectives:
 
 * Real-time ingestion and processing of trip events
