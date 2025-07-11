@@ -3,7 +3,7 @@ name: Deploy Both Lambdas
 on:
   push:
     branches:
-      - lab6
+      - lab7
     paths:
       - "lambda/**"
 
