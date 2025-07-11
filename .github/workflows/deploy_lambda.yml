@@ -1,4 +1,4 @@
-name: Deploy Both Lambdas to aws
+name: Deploy Both Lambdas to AWS
 
 on:
   push:
@@ -19,9 +19,7 @@ jobs:
 
       - name: 📦 Zip processor Lambda
         run: |
-          cd lambda
-          zip -r ../processor.zip processor_handler.py
-          cd ..
+          zip -j processor.zip lambda/processor_handler.py
 
       - name: 🚀 Deploy processor Lambda
         uses: aws-actions/aws-cli-action@v1
@@ -36,9 +34,7 @@ jobs:
 
       - name: 📦 Zip KPI Lambda
         run: |
-          cd lambda
-          zip -r ../kpi.zip kpi_handler.py
-          cd ..
+          zip -j kpi.zip lambda/kpi_handler.py
 
       - name: 🚀 Deploy KPI Lambda
         uses: aws-actions/aws-cli-action@v1
