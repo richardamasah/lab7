@@ -7,6 +7,7 @@ import re
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client('s3')
 
+#table config
 TABLE_NAME = 'TripEvents'
 BUCKET_NAME = 'lab6kinesis'
 RAW_FOLDER = 'raw_events'
