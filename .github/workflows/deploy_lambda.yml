@@ -37,7 +37,7 @@ jobs:
           zip -j kpi.zip lambda/kpi_handler.py
 
       - name: 🚀 Deploy KPI Lambda
-        uses: aws-actions/aws-cli-action@v1
+        uses: aws-actions/aws-cli@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
