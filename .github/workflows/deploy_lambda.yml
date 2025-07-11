@@ -1,4 +1,4 @@
-name: Deploy Both Lambdas
+name: Deploy Both Lambdas to aws
 
 on:
   push:
